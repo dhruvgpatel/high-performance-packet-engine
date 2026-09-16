@@ -1,0 +1,35 @@
+# Build artifacts
+build/
+build-*/
+bin/
+lib/
+*.o
+*.a
+*.so
+*.dylib
+*.out
+*.dSYM/
+compile_commands.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Test / Benchmark outputs
+results/plots/*.png
+results/plots/*.pdf
+results/benchmark_*.json
+results/benchmark_*.csv
+results/*.log
+!results/.gitkeep
+!results/plots/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/

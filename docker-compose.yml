@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  packet_engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: packet_engine_server
+    ports:
+      - "9000:9000/udp"
+      - "9000:9000/tcp"
+    command: ["--protocol", "udp", "--port", "9000", "--workers", "4", "--queue-size", "10000"]
+    restart: unless-stopped

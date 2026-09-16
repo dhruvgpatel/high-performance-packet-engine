@@ -1,0 +1,27 @@
+{
+  "elapsed_seconds": 1.1252,
+  "total_received": 1000,
+  "total_processed": 1000,
+  "valid_packets": 1000,
+  "invalid_packets": 0,
+  "dropped_packets": 0,
+  "total_bytes_received": 168000,
+  "total_bytes_processed": 128000,
+  "throughput_pps": 888.728,
+  "throughput_mbps": 0.910058,
+  "avg_latency_us": 15394.7,
+  "p50_latency_us": 16805.5,
+  "p95_latency_us": 25063.8,
+  "p99_latency_us": 25494.6,
+  "min_latency_us": 131.209,
+  "max_latency_us": 25562.9,
+  "avg_queue_dwell_us": 12801.3,
+  "avg_processing_time_us": 66.8026,
+  "categories": {
+    "data": 481,
+    "high_priority": 519,
+    "control": 0,
+    "ack": 0
+  },
+  "worker_distribution": [501, 499]
+}

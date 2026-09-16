@@ -1,0 +1,23 @@
+{
+  "server": {
+    "protocol": "udp",
+    "port": 9000,
+    "ip": "127.0.0.1",
+    "worker_threads": 4,
+    "queue_capacity": 10000,
+    "metrics_interval_seconds": 2,
+    "socket_recv_buffer_bytes": 4194304,
+    "batch_size": 64
+  },
+  "processing": {
+    "enable_crc32": true,
+    "enable_payload_hash": true,
+    "simulated_workload_iterations": 100,
+    "simulated_delay_us": 0
+  },
+  "logging": {
+    "log_level": "INFO",
+    "log_file": "",
+    "log_to_console": true
+  }
+}

@@ -1,0 +1,102 @@
+name: C++17 Packet Engine CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (Ubuntu 22.04 Clang & GCC)
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        build_type: [Release, Debug]
+        include:
+          - compiler: gcc
+            cxx: g++-12
+            cc: gcc-12
+          - compiler: clang
+            cxx: clang++-14
+            cc: clang-14
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential python3 python3-pip ninja-build
+          pip3 install --upgrade pip
+          pip3 install matplotlib pandas
+
+      - name: Configure CMake
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DBUILD_TESTS=ON
+
+      - name: Build All Targets
+        run: |
+          cmake --build build --parallel $(nproc)
+
+      - name: Execute Unit and Integration Test Suite
+        run: |
+          ctest --test-dir build --output-on-failure --timeout 60
+
+      - name: Run E2E Benchmark Smoke Test
+        run: |
+          python3 scripts/run_benchmark.py --quick
+          python3 scripts/analyze_results.py
+          python3 scripts/plot_results.py
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ matrix.compiler }}-${{ matrix.build_type }}
+          path: |
+            results/benchmark_results.csv
+            results/BENCHMARK_REPORT.md
+            results/plots/*.png
+
+  sanitizers:
+    name: Sanitizer Verification (ASan & TSan)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential clang ninja-build
+
+      - name: Build & Test with AddressSanitizer (ASan)
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          cmake -S . -B build-asan -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DENABLE_ASAN=ON \
+            -DBUILD_TESTS=ON
+          cmake --build build-asan --parallel $(nproc)
+          ctest --test-dir build-asan --output-on-failure
+
+      - name: Build & Test with ThreadSanitizer (TSan)
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          cmake -S . -B build-tsan -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DENABLE_TSAN=ON \
+            -DBUILD_TESTS=ON
+          cmake --build build-tsan --parallel $(nproc)
+          ctest --test-dir build-tsan --output-on-failure
